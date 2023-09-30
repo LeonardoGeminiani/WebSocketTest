@@ -10,6 +10,16 @@ var app = builder.Build();
 
 app.MapGet("/", () => "Hello World!");
 
+var timer = new PeriodicTimer(TimeSpan.FromMinutes(5));
+Thread childthread = new(async () =>
+{
+    while (await timer.WaitForNextTickAsync())
+    {
+        // check game id state
+    }
+});
+childthread.Start();
+
 //app.UseHttpsRedirection();
 
 app.UseWebSockets();

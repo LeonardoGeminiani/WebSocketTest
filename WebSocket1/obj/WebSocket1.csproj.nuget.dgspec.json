@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "/home/leo/Projects/WebSocketTest/WebSocket1/WebSocket1.csproj": {}
+    "/home/leonardo/RiderProjects/WebSocket1/WebSocket1/WebSocket1.csproj": {}
   },
   "projects": {
-    "/home/leo/Projects/WebSocketTest/WebSocket1/WebSocket1.csproj": {
+    "/home/leonardo/RiderProjects/WebSocket1/WebSocket1/WebSocket1.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/leo/Projects/WebSocketTest/WebSocket1/WebSocket1.csproj",
+        "projectUniqueName": "/home/leonardo/RiderProjects/WebSocket1/WebSocket1/WebSocket1.csproj",
         "projectName": "WebSocket1",
-        "projectPath": "/home/leo/Projects/WebSocketTest/WebSocket1/WebSocket1.csproj",
-        "packagesPath": "/home/leo/.nuget/packages/",
-        "outputPath": "/home/leo/Projects/WebSocketTest/WebSocket1/obj/",
+        "projectPath": "/home/leonardo/RiderProjects/WebSocket1/WebSocket1/WebSocket1.csproj",
+        "packagesPath": "/home/leonardo/.nuget/packages/",
+        "outputPath": "/home/leonardo/RiderProjects/WebSocket1/WebSocket1/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/home/leo/.nuget/NuGet/NuGet.Config"
+          "/home/leonardo/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net7.0"
@@ -56,7 +56,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/home/leo/dotnet/sdk/7.0.401/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/home/leonardo/dotnet/sdk/7.0.401/RuntimeIdentifierGraph.json"
         }
       }
     }

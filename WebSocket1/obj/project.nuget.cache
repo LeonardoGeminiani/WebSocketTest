@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "ZhSyOFdCpiGMq21WLEKdIMe3D19G7QoLVVodZpBUfhEkf/pGVfg7FIA7Ml9iApeuswv+gbuZTMwJF3qGxFd0ow==",
+  "dgSpecHash": "0WQnistbeb2qwT6xTb96Hn5vhyM6ue91dq8nxHpUf/NVtdZwhk1S+/flhZ++lyJfCvia3PRtFEftAkOcmxDeQw==",
   "success": true,
-  "projectFilePath": "/home/leo/Projects/WebSocketTest/WebSocket1/WebSocket1.csproj",
+  "projectFilePath": "/home/leonardo/RiderProjects/WebSocket1/WebSocket1/WebSocket1.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }
