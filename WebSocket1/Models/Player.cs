@@ -2,8 +2,8 @@ namespace WebSocket1.Models;
 
 public class Player
 {
-    public string Name;
-    public int Age;
+    public string Name { get; set; }
+    public int Age { get; set; }
 
     public override string ToString()
     {

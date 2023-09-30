@@ -37,6 +37,18 @@ public class WebSocketsController : ControllerBase
           HttpContext.Response.StatusCode = BadRequest;
       }
     }
+
+    private string BufferToString(byte[] buffer)
+    {
+        var msg = "";
+        for (var i = 0; i < buffer.Length; i++)
+        {
+            if (buffer[i] == 0) break;
+            msg += (char)buffer[i];
+        }
+
+        return msg;
+    }
     
     private async Task Echo(WebSocket webSocket)
     {
@@ -47,7 +59,8 @@ public class WebSocketsController : ControllerBase
 
         while (!result.CloseStatus.HasValue)
         {
-            var serverMsg = Encoding.UTF8.GetBytes($"Server: Hello. You said: {Encoding.UTF8.GetString(buffer)}");
+            // var serverMsg = Encoding.UTF8.GetBytes($"Server: Hello. You said: {BufferToString(buffer)}");
+            var serverMsg = Encoding.UTF8.GetBytes(BufferToString(buffer));
             await webSocket.SendAsync(new ArraySegment<byte>(serverMsg, 0, serverMsg.Length), 
                 result.MessageType, result.EndOfMessage, CancellationToken.None);
             _logger.Log(LogLevel.Information, "Message sent to Client");
@@ -56,20 +69,16 @@ public class WebSocketsController : ControllerBase
             result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
             
             _logger.Log(LogLevel.Information, "Message received from Client");
-            
-            var msg = "";
-            for (var i = 0; i < buffer.Length; i++)
-            {
-                if (buffer[i] == 0) break;
-                msg += (char)buffer[i];
-            }
+
+            var msg = BufferToString(buffer);
 
             try
             {
+                // JsonSerializer.Deserialize works only with propriety no with fields 
                 var p = JsonSerializer.Deserialize<Player>(msg); // to convert json string in to object; webSocket.send(JSON.stringify(obj))
-                _logger.Log(LogLevel.Information, $"msg: {p}");
+                _logger.Log(LogLevel.Information, $"msg: {msg}, Player {p}");
             }
-            catch (Exception e)
+            catch
             {
                 _logger.Log(LogLevel.Error, $"Fail, {msg}");
             }
