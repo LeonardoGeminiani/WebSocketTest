@@ -15,76 +15,83 @@ namespace WebSocket1.Controllers;
 [Route("[controller]")]
 public class WebSocketsController : ControllerBase
 {
-    private new const int BadRequest = ((int)HttpStatusCode.BadRequest);
-    private readonly ILogger<WebSocketsController> _logger;
+private new const int BadRequest = ((int)HttpStatusCode.BadRequest);
+private readonly ILogger<WebSocketsController> _logger;
 
-    public WebSocketsController(ILogger<WebSocketsController> logger)
+public WebSocketsController(ILogger<WebSocketsController> logger)
+{
+    _logger = logger;
+}
+
+[HttpGet("/ws/{id}")]
+public async Task Get(uint id)
+{
+    var game = GameGenerationController.GetGame(id);
+    if(game is null)
     {
-        _logger = logger;
-    }
-
-    [HttpGet("/ws")]
-    public async Task Get()
-    {
-      if (HttpContext.WebSockets.IsWebSocketRequest)
-      {
-          using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
-          _logger.Log(LogLevel.Information, "WebSocket connection established");
-          await Echo(webSocket);
-      }
-      else
-      {
-          HttpContext.Response.StatusCode = BadRequest;
-      }
-    }
-
-    private string BufferToString(byte[] buffer)
-    {
-        var msg = "";
-        for (var i = 0; i < buffer.Length; i++)
-        {
-            if (buffer[i] == 0) break;
-            msg += (char)buffer[i];
-        }
-
-        return msg;
+        HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+        return;
     }
     
-    private async Task Echo(WebSocket webSocket)
+    if (HttpContext.WebSockets.IsWebSocketRequest)
     {
-        var buffer = new byte[1024 * 4];
+        using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
+        _logger.Log(LogLevel.Information, "WebSocket connection established");
+        await Echo(webSocket, game);
+    }
+    else
+    {
+        HttpContext.Response.StatusCode = BadRequest;
+    }
+}
+
+private string BufferToString(byte[] buffer)
+{
+    var msg = "";
+    for (var i = 0; i < buffer.Length; i++)
+    {
+        if (buffer[i] == 0) break;
+        msg += (char)buffer[i];
+    }
+
+    return msg;
+}
+
+private async Task Echo(WebSocket webSocket, Game game)
+{
+    var buffer = new byte[1024 * 4];
+    
+    var result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+    _logger.Log(LogLevel.Information, "Message received from Client");
+
+    while (!result.CloseStatus.HasValue)
+    {
+        // var serverMsg = Encoding.UTF8.GetBytes($"Server: Hello. You said: {BufferToString(buffer)}");
+        var serverMsg = Encoding.UTF8.GetBytes(BufferToString(buffer));
+        await webSocket.SendAsync(new ArraySegment<byte>(serverMsg, 0, serverMsg.Length), 
+            result.MessageType, result.EndOfMessage, CancellationToken.None);
+        _logger.Log(LogLevel.Information, "Message sent to Client");
         
-        var result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+        buffer = new byte[1024 * 4];
+        result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+        
         _logger.Log(LogLevel.Information, "Message received from Client");
 
-        while (!result.CloseStatus.HasValue)
+        var msg = BufferToString(buffer);
+
+        try
         {
-            // var serverMsg = Encoding.UTF8.GetBytes($"Server: Hello. You said: {BufferToString(buffer)}");
-            var serverMsg = Encoding.UTF8.GetBytes(BufferToString(buffer));
-            await webSocket.SendAsync(new ArraySegment<byte>(serverMsg, 0, serverMsg.Length), 
-                result.MessageType, result.EndOfMessage, CancellationToken.None);
-            _logger.Log(LogLevel.Information, "Message sent to Client");
-            
-            buffer = new byte[1024 * 4];
-            result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-            
-            _logger.Log(LogLevel.Information, "Message received from Client");
-
-            var msg = BufferToString(buffer);
-
-            try
-            {
-                // JsonSerializer.Deserialize works only with propriety no with fields 
-                var p = JsonSerializer.Deserialize<Player>(msg); // to convert json string in to object; webSocket.send(JSON.stringify(obj))
-                _logger.Log(LogLevel.Information, $"msg: {msg}, Player {p}");
-            }
-            catch
-            {
-                _logger.Log(LogLevel.Error, $"Fail, {msg}");
-            }
-            
+            // JsonSerializer.Deserialize works only with propriety no with fields 
+            var p = JsonSerializer.Deserialize<Player>(msg); // to convert json string in to object; webSocket.send(JSON.stringify(obj))
+            _logger.Log(LogLevel.Information, $"msg: {msg}, Player {p}");
         }
-        await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
-        _logger.Log(LogLevel.Information, "WebSocket connection closed");
+        catch
+        {
+            _logger.Log(LogLevel.Error, $"Fail, {msg}");
+        }
+        
     }
+    await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
+    _logger.Log(LogLevel.Information, "WebSocket connection closed");
+}
 }

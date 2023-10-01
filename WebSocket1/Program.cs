@@ -1,4 +1,6 @@
 using System.Net;
+using WebSocket1.Controllers;
+using WebSocket1.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,15 +12,18 @@ var app = builder.Build();
 
 app.MapGet("/", () => "Hello World!");
 
-var timer = new PeriodicTimer(TimeSpan.FromMinutes(5));
-Thread childthread = new(async () =>
+uint minutes = 5;
+var timer = new PeriodicTimer(TimeSpan.FromMinutes(minutes));
+Thread childThread = new(async () =>
 {
     while (await timer.WaitForNextTickAsync())
     {
         // check game id state
+        GameGenerationController.CheckGameIdStatus(minutes);
     }
 });
-childthread.Start();
+
+childThread.Start();
 
 //app.UseHttpsRedirection();
 
