@@ -8,9 +8,9 @@ namespace WebSocket1.Controllers;
 [Route("[controller]")]
 public class GameGenerationController : ControllerBase
 {
-    private const uint StartGameId = 1;
+    private const int StartGameId = 1;
 
-    private const uint EndGameId = 100;
+    private const int EndGameId = 100;
     
     private static readonly Game?[] GameIds = new Game[EndGameId + 1 - StartGameId];
 
@@ -67,7 +67,7 @@ public class GameGenerationController : ControllerBase
     //     }
     // }
 
-    public static Game? GetGame(uint id)
+    public static Game? GetGame(int id)
     {
         try
         {
@@ -79,15 +79,13 @@ public class GameGenerationController : ControllerBase
         }
     }
     
-    public static void CloseGameId(uint id)
+    public static void CloseGameId(int id)
     {
-        try
-        {
-            GameIds[id - StartGameId] = null;
-        }
-        catch
-        {
-            throw new ArgumentOutOfRangeException(nameof(id));
-        }
+        id -= StartGameId;
+        if(id < 0 || id >= GameIds.Length) throw new ArgumentOutOfRangeException(nameof(id));
+        
+        if (GameIds[id] is not null && !GameIds[id]!.Socked)
+            throw new Exception("you can't close a non socked Game before timeout");
+        GameIds[id] = null;
     }
 }

@@ -24,7 +24,7 @@ public WebSocketsController(ILogger<WebSocketsController> logger)
 }
 
 [HttpGet("/ws/{id}")]
-public async Task Get(uint id)
+public async Task Get(int id)
 {
     var game = GameGenerationController.GetGame(id);
     if(game is null)
@@ -37,7 +37,7 @@ public async Task Get(uint id)
     {
         using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
         _logger.Log(LogLevel.Information, "WebSocket connection established");
-        await Echo(webSocket, game);
+        await Echo(webSocket, game, id);
     }
     else
     {
@@ -57,7 +57,7 @@ private string BufferToString(byte[] buffer)
     return msg;
 }
 
-private async Task Echo(WebSocket webSocket, Game game)
+private async Task Echo(WebSocket webSocket, Game game, int id)
 {
     var buffer = new byte[1024 * 4];
     
